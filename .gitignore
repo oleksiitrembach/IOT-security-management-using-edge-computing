@@ -1,4 +1,15 @@
-data/*.csv
-data/*.png
+# Ignore raw experiment output by default; commit selected result files intentionally with git add -f.
+data/*
+!data/.gitkeep
 __pycache__/
 *.pyc
+*.docx
+.venv/
+.vscode/
+.idea/
+docker-compose.override.yml
+*.log
+*.sqlite
+*~
+.DS_Store
+Thumbs.db

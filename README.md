@@ -7,7 +7,23 @@ IoT. Pozwala zmierzyc metryki rozdzialu 7 BEZ zadnego sprzetu fizycznego.
 
 ## Wymagania
 - Docker + Docker Compose v2 (`docker compose version`)
-- Python 3 na hoscie do analizy: `pip install -r analyze/requirements-analyze.txt`
+- Python 3.12 na hoście
+- Lokalne środowisko Python w `.venv`
+
+## Środowisko Python
+1. Utwórz wirtualne środowisko w katalogu projektu:
+
+    python -m venv .venv
+
+2. Aktywuj środowisko:
+
+    .venv\Scripts\activate
+
+3. Zainstaluj pakiety:
+
+    python -m pip install --upgrade pip
+    python -m pip install -r requirements.txt
+    python -m pip install -r analyze/requirements-analyze.txt
 
 ## Architektura (mapuje na rozdz. 4 pracy)
     device(y)  --MQTT-->  broker(Mosquitto)  -->  edge (detekcja, tryb edge)

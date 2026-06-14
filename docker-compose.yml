@@ -21,6 +21,10 @@ services:
       MAX_PAYLOAD: ${MAX_PAYLOAD:-512}
       WARMUP: ${WARMUP:-30}
       K_SIGMA: ${K_SIGMA:-4.0}
+      DATA_DIR: /data
+      STATS_INTERVAL: ${STATS_INTERVAL:-0.5}
+    volumes:
+      - ./data:/data
     depends_on: [broker]
     # Emulacja ograniczonego urzadzenia brzegowego (cgroups) -> pomiar PB3:
     cpus: 1.0

@@ -49,6 +49,18 @@ if os.path.exists(stats_path):
     print(f"CPU sr={s.cpu_perc.mean():.1f}%  CPU p95={s.cpu_perc.quantile(0.95):.1f}%  "
           f"RAM sr={s.mem_mb.mean():.1f} MB  RAM max={s.mem_mb.max():.1f} MB")
 
+telemetry_path = os.path.join(DATA_DIR, "edge_telemetry.csv" if VARIANT == "brzegowy" else "central_telemetry.csv")
+if os.path.exists(telemetry_path):
+    t = pd.read_csv(telemetry_path)
+    published = len(gt)
+    received = len(t)
+    lost = published - received
+    rate = lost / published if published else float("nan")
+    print("--- Straty pakietow (Tabela 7) ---")
+    print(f"wyslano={published} odebrano={received} stracono={lost} ({rate:.3f})")
+else:
+    print("--- Brak pliku telemetrycznego do obliczenia strat pakietow ---")
+
 try:
     import matplotlib
     matplotlib.use("Agg")
