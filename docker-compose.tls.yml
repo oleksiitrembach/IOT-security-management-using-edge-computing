@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------------------
+# docker-compose.tls.yml — override do scenariusza S5 (TLS + ACL)
+# ---------------------------------------------------------------------------
+# Użycie:
+#   1. Wygeneruj certyfikaty: ./scripts/gen_certs.sh
+#   2. Uruchom:
+#      docker compose -f docker-compose.yml -f docker-compose.tls.yml up -d
+# ---------------------------------------------------------------------------
+
+services:
+  broker:
+    volumes:
+      - ./mosquitto/mosquitto-tls.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./certs:/mosquitto/certs:ro
+    ports:
+      - "8883:8883"
+
+  edge:
+    environment:
+      BROKER_PORT: "8883"
+      MQTT_TLS: "1"
+      MQTT_CA: /certs/ca.crt
+      MQTT_CERT: /certs/client.crt
+      MQTT_KEY: /certs/client.key
+      MQTT_USER: edge-node
+      MQTT_PASS: edgepass
+    volumes:
+      - ./certs:/certs:ro
+
+  central:
+    environment:
+      BROKER_PORT: "8883"
+      MQTT_TLS: "1"
+      MQTT_CA: /certs/ca.crt
+      MQTT_CERT: /certs/client.crt
+      MQTT_KEY: /certs/client.key
+      MQTT_USER: central
+      MQTT_PASS: centralpass
+    volumes:
+      - ./certs:/certs:ro
+
+  device:
+    environment:
+      BROKER_PORT: "8883"
+      MQTT_TLS: "1"
+      MQTT_CA: /certs/ca.crt
+      MQTT_CERT: /certs/client.crt
+      MQTT_KEY: /certs/client.key
+      MQTT_USER: device
+      MQTT_PASS: devicepass
+    volumes:
+      - ./certs:/certs:ro

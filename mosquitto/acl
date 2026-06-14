@@ -1,0 +1,19 @@
+# Przykladowa lista ACL (zasada najmniejszych uprawnien) - do scenariusza S5.
+# Urzadzenie moze tylko publikowac na swoj temat telemetrii.
+# Wezel brzegowy/central moze subskrybowac telemetrie i publikowac alerty.
+
+# Urządzenia IoT — publikacja tylko na własny temat
+user device
+topic write iot/+/telemetry
+
+# Węzeł brzegowy — odczyt telemetrii + publikacja alertów
+user edge-node
+topic read iot/+/telemetry
+topic write alerts
+topic read alerts
+
+# System centralny — odczyt telemetrii + odczyt alertów
+user central
+topic read iot/+/telemetry
+topic read alerts
+topic write alerts

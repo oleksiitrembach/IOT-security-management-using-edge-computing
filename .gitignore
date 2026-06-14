@@ -1,15 +1,45 @@
-# Ignore raw experiment output by default; commit selected result files intentionally with git add -f.
+# ===========================================================================
+# .gitignore — IoT Edge Security Testbed
+# ===========================================================================
+
+# --- Experiment data (commit selected results intentionally with git add -f) ---
 data/*
 !data/.gitkeep
+
+# --- Python ---
 __pycache__/
 *.pyc
-*.docx
+*.pyo
 .venv/
+*.egg-info/
+dist/
+build/
+
+# --- Thesis document (private — not part of the codebase) ---
+*.docx
+*.pptx
+*.xlsx
+
+# --- TLS certificates (generated, contain private keys) ---
+certs/
+
+# --- Environment (may contain secrets) ---
+.env
+
+# --- IDE ---
 .vscode/
 .idea/
-docker-compose.override.yml
-*.log
-*.sqlite
+*.swp
 *~
+
+# --- Docker ---
+docker-compose.override.yml
+
+# --- OS ---
 .DS_Store
 Thumbs.db
+Desktop.ini
+
+# --- Logs ---
+*.log
+*.sqlite

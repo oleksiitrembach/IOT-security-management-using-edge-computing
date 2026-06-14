@@ -8,6 +8,13 @@ services:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
     ports:
       - "1883:1883"
+    healthcheck:
+      test: ["CMD", "mosquitto_pub", "-t", "healthcheck", "-m", "ok", "-q", "0"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
 
   edge:
     build: .
@@ -24,11 +31,14 @@ services:
       DATA_DIR: /data
       STATS_INTERVAL: ${STATS_INTERVAL:-0.5}
     volumes:
-      - ./data:/data
-    depends_on: [broker]
-    # Emulacja ograniczonego urzadzenia brzegowego (cgroups) -> pomiar PB3:
+      - ${DATA_DIR:-./data}:/data
+    depends_on:
+      broker:
+        condition: service_healthy
+    # Emulacja ograniczonego urządzenia brzegowego (cgroups) -> pomiar PB3:
     cpus: 1.0
     mem_limit: 512m
+    stop_grace_period: 15s
 
   central:
     build: .
@@ -42,11 +52,16 @@ services:
       MAX_PAYLOAD: ${MAX_PAYLOAD:-512}
       WARMUP: ${WARMUP:-30}
       K_SIGMA: ${K_SIGMA:-4.0}
+      DATA_DIR: /data
+      STATS_INTERVAL: ${STATS_INTERVAL:-0.5}
     volumes:
-      - ./data:/data
+      - ${DATA_DIR:-./data}:/data
     cap_add:
       - NET_ADMIN          # wymagane do `tc netem` (scripts/apply_netem.sh)
-    depends_on: [broker]
+    depends_on:
+      broker:
+        condition: service_healthy
+    stop_grace_period: 15s
 
   device:
     build: .
@@ -60,6 +75,10 @@ services:
       ANOMALY_RATE: ${ANOMALY_RATE:-0.05}
       FLOOD_BURST: ${FLOOD_BURST:-40}
       PAYLOAD_BYTES: ${PAYLOAD_BYTES:-1024}
+      DATA_DIR: /data
     volumes:
-      - ./data:/data
-    depends_on: [broker, edge, central]
+      - ${DATA_DIR:-./data}:/data
+    depends_on:
+      broker:
+        condition: service_healthy
+    stop_grace_period: 10s
