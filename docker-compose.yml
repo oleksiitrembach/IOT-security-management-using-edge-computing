@@ -1,0 +1,61 @@
+name: iot-edge-testbed
+
+services:
+  broker:
+    image: eclipse-mosquitto:2
+    container_name: iot-broker
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    ports:
+      - "1883:1883"
+
+  edge:
+    build: .
+    image: iot-testbed
+    container_name: iot-edge
+    command: python edge_node.py
+    environment:
+      BROKER_HOST: broker
+      DETECTION_LOCATION: ${DETECTION_LOCATION:-edge}
+      FREQ_THRESHOLD: ${FREQ_THRESHOLD:-20}
+      MAX_PAYLOAD: ${MAX_PAYLOAD:-512}
+      WARMUP: ${WARMUP:-30}
+      K_SIGMA: ${K_SIGMA:-4.0}
+    depends_on: [broker]
+    # Emulacja ograniczonego urzadzenia brzegowego (cgroups) -> pomiar PB3:
+    cpus: 1.0
+    mem_limit: 512m
+
+  central:
+    build: .
+    image: iot-testbed
+    container_name: iot-central
+    command: python central.py
+    environment:
+      BROKER_HOST: broker
+      DETECTION_LOCATION: ${DETECTION_LOCATION:-edge}
+      FREQ_THRESHOLD: ${FREQ_THRESHOLD:-20}
+      MAX_PAYLOAD: ${MAX_PAYLOAD:-512}
+      WARMUP: ${WARMUP:-30}
+      K_SIGMA: ${K_SIGMA:-4.0}
+    volumes:
+      - ./data:/data
+    cap_add:
+      - NET_ADMIN          # wymagane do `tc netem` (scripts/apply_netem.sh)
+    depends_on: [broker]
+
+  device:
+    build: .
+    image: iot-testbed
+    command: python device_sim.py
+    environment:
+      BROKER_HOST: broker
+      SCENARIO: ${SCENARIO:-mixed}
+      RATE: ${RATE:-5}
+      DURATION: ${DURATION:-120}
+      ANOMALY_RATE: ${ANOMALY_RATE:-0.05}
+      FLOOD_BURST: ${FLOOD_BURST:-40}
+      PAYLOAD_BYTES: ${PAYLOAD_BYTES:-1024}
+    volumes:
+      - ./data:/data
+    depends_on: [broker, edge, central]
