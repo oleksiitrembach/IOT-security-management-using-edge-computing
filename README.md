@@ -28,15 +28,18 @@ and `tc netem` network emulation.
 ```
 
 - **Edge variant:** Detection runs on the edge node (local, no latency).
-- **Central variant:** Detection runs on the central system, loaded with
-  network latency (`tc netem`) simulating the path to a cloud region.
+- **Central variant:** Detection runs on the central system, reached through a
+  directional latency proxy (`toxiproxy`, downstream broker→central) that
+  simulates the path to a cloud region. This replaces egress-only `tc netem`,
+  which could not inject latency on the inbound telemetry path.
 - **Difference = impact of processing location** on detection time (PB1/H1).
 
 ## Requirements
 
 - Docker + Docker Compose v2 (`docker compose version`)
-- Python 3.12+ on the host (for analysis scripts)
-- Bash (Git Bash on Windows, or WSL)
+- Python 3.12+ on the host (canonical runner `run.py` + analysis scripts)
+- Bash is **optional** — the `scripts/*.sh` are thin wrappers that delegate to
+  `run.py`, so on Windows you can run everything with `python run.py ...`.
 
 ## Quick Start
 
@@ -53,11 +56,15 @@ pip install -r requirements.txt
 pip install -r analyze/requirements-analyze.txt
 
 # 3. Run a single experiment (edge variant, mixed scenario, 2 min)
-DETECTION_LOCATION=edge SCENARIO=mixed DURATION=120 ./scripts/run_scenario.sh
-
-# 4. Analyze results
-DATA_DIR=./data VARIANT=edge python analyze/analyze.py
+python run.py scenario edge mixed --duration 120
+# central variant (clean ~60 ms cloud latency via toxiproxy):
+python run.py scenario central mixed --duration 120 --latency 60ms
 ```
+
+`run.py` performs the full, correct lifecycle for every run
+(down → clean data dir → up → wait broker → [central: toxiproxy latency] →
+run device(s) → stop edge+central to flush CSVs → down) and then runs the
+per-run analysis automatically.
 
 ## Scenario Mapping (Thesis Table 3)
 
@@ -84,52 +91,34 @@ DATA_DIR=./data VARIANT=edge python analyze/analyze.py
 ## Running All Experiments
 
 ```bash
-# Full cycle: 5 scenarios × 2 variants × 30 repetitions ≈ 12h
-./scripts/run_all_experiments.sh
+# Base cycle: 5 scenarios × 2 variants × 30 repetitions
+python run.py all --runs 30 --duration 120
 
-# Quick smoke test: 3 runs × 30s
-RUNS=3 DURATION=30 ./scripts/run_all_experiments.sh
+# Extended series (PB1 clean central, PB5 scalability, S7 failure, PB4/S6):
+python run.py extended --runs-pb1 30 --runs-scale 10 --duration 120
+
+# Quick smoke test (one short central run)
+python run.py scenario central flood --duration 20
 ```
 
-## Manual Step-by-Step
+## Individual Research Series
 
 ```bash
-# 1. Start infrastructure
-DETECTION_LOCATION=edge docker compose up -d --build broker edge central
+# PB1 — clean central detection time (toxiproxy), 30 runs per scenario
+python run.py batch central flood 30 --latency 60ms
 
-# 2. (central only) Add latency emulation
-./scripts/apply_netem.sh add 60ms
+# PB5 — scalability sweep (edge, mixed) over device counts
+python run.py scalability --runs 10 --counts 1 5 10 20
 
-# 3. Run devices (blocks until DURATION expires)
-SCENARIO=flood DURATION=120 docker compose up --build device
+# S7 — edge node failure and recovery
+python run.py failure --duration 180 --kill-at 60 --down 30
 
-# 4. Stop with graceful shutdown
-docker compose stop --timeout 10 edge central
-
-# 5. Analyze
-DATA_DIR=./data VARIANT=edge python analyze/analyze.py
-
-# 6. Cleanup
-docker compose down
+# PB4/S6 — access control (TLS + ACL); generates certs in a container
+python run.py access-control
 ```
 
-## Scaling Devices (PB5)
-
-```bash
-SCENARIO=mixed DEVICE_COUNT=10 ./scripts/run_scenario.sh
-```
-
-Each replica gets a unique `DEVICE_ID` from its container hostname.
-
-## Scenario S5 — TLS + ACL
-
-```bash
-# Generate certificates
-./scripts/gen_certs.sh
-
-# Run with TLS overlay
-docker compose -f docker-compose.yml -f docker-compose.tls.yml up -d
-```
+Devices scale via `--devices N`; each replica gets a unique `DEVICE_ID` from
+its container hostname (PB5).
 
 ## Output Files
 
@@ -149,10 +138,10 @@ docker compose -f docker-compose.yml -f docker-compose.tls.yml up -d
 
 ```bash
 # 30 runs of edge × mixed
-./scripts/run_batch.sh edge mixed 30
+python run.py batch edge mixed 30
 
-# 30 runs of central × mixed (with 60ms latency)
-./scripts/run_batch.sh central mixed 30 60ms
+# 30 runs of central × mixed (with 60ms toxiproxy latency)
+python run.py batch central mixed 30 --latency 60ms
 
 # Aggregate results across all runs
 python analyze/aggregate.py --data-root ./data
@@ -182,8 +171,8 @@ python -m pytest tests/ -v
 
 - **n ≥ 30 repetitions** per scenario/variant for statistical significance.
 - All containers share the host clock → no NTP synchronization needed.
-- Cloud latency emulated via `tc netem` on the central container
-  (limitation: emulation, not real WAN — noted in §7.5).
+- Cloud latency emulated via a `toxiproxy` directional latency proxy on the
+  broker→central path (limitation: emulation, not real WAN — noted in §7.5).
 - Resource measurement via `psutil` inside containers (process-level,
   more precise than `docker stats`).
 - Edge node limited to 1 CPU / 512 MB via cgroups — emulates constrained

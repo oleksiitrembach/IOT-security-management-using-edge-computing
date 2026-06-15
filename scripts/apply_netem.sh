@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# LEGACY/NIEUZYWANE: opoznienie chmury emulujemy teraz toxiproxy (kierunkowo,
+# broker->central), bo `tc netem` na root qdisc dziala tylko na egress i nie
+# dodawal opoznienia na sciezce telemetrii (broker->central). Patrz run.py
+# (init_toxiproxy) oraz docker-compose.latency.yml. Plik zachowany pomocniczo.
+#
 # Naklada/zdejmuje opoznienie sieciowe na kontenerze centralnym (emulacja chmury).
 # Wlacz PRZED przebiegiem wariantu scentralizowanego:
 #   ./scripts/apply_netem.sh add 60ms

@@ -11,6 +11,7 @@ services:
   broker:
     volumes:
       - ./mosquitto/mosquitto-tls.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/acl:/mosquitto/config/acl:ro
       - ./certs:/mosquitto/certs:ro
     ports:
       - "8883:8883"

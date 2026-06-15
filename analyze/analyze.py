@@ -69,11 +69,15 @@ print(f"\n{'='*50}")
 print(f"  Wariant: {VARIANT}")
 print(f"{'='*50}")
 
+def _fmt(x):
+    """'—' dla miar nieokreślonych (S1: brak anomalii → 0/0), inaczej 4 miejsca."""
+    return "—" if x is None else f"{x:.4f}"
+
 print("\n--- Skutecznosc detekcji (Tabela 5) ---")
 print(f"  TP = {TP}   FP = {FP}   FN = {FN}   TN = {TN}")
-print(f"  Precyzja  = {prec:.4f}")
-print(f"  Czulosc   = {rec:.4f}")
-print(f"  F1        = {f1:.4f}")
+print(f"  Precyzja  = {_fmt(prec)}")
+print(f"  Czulosc   = {_fmt(rec)}")
+print(f"  F1        = {_fmt(f1)}")
 print(f"  FPR       = {fpr:.4f}")
 
 # ---------------------------------------------------------------------------
