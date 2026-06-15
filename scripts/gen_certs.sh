@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ---------------------------------------------------------------------------
-# gen_certs.sh — generuje certyfikaty CA + serwer + klient do scenariusza S5
+# gen_certs.sh — generuje certyfikaty CA + serwer + klient do scenariusza S6
 # ---------------------------------------------------------------------------
 # Użycie: ./scripts/gen_certs.sh
 # Wynik:  certs/ z plikami CA, serwera i klienta
@@ -13,7 +13,7 @@ SUBJ_CA="/CN=IoT-Testbed-CA"
 SUBJ_SERVER="/CN=iot-broker"
 SUBJ_CLIENT="/CN=iot-client"
 
-echo ">> Generowanie certyfikatow TLS do scenariusza S5..."
+echo ">> Generowanie certyfikatow TLS do scenariusza S6..."
 mkdir -p "$CERT_DIR"
 
 # CA (Certificate Authority)

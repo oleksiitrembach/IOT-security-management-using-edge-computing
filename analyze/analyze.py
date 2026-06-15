@@ -56,10 +56,14 @@ FP = int(((m.detected) & (~m.is_anomaly)).sum())
 FN = int(((~m.detected) & (m.is_anomaly)).sum())
 TN = int(((~m.detected) & (~m.is_anomaly)).sum())
 
-prec = TP / (TP + FP) if (TP + FP) > 0 else 0.0
-rec = TP / (TP + FN) if (TP + FN) > 0 else 0.0
-f1 = 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0.0
+has_anom = (TP + FN) > 0
+prec = TP / (TP + FP) if (TP + FP) > 0 else None
+rec = TP / (TP + FN) if (TP + FN) > 0 else None
+f1 = 2 * prec * rec / (prec + rec) if (has_anom and prec is not None and rec is not None and (prec + rec) > 0) else None
 fpr = FP / (FP + TN) if (FP + TN) > 0 else 0.0
+
+if not has_anom:
+    prec = rec = f1 = None
 
 print(f"\n{'='*50}")
 print(f"  Wariant: {VARIANT}")

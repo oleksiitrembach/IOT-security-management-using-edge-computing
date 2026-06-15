@@ -2,6 +2,8 @@
 # Zbiera CPU% i RAM kontenera wezla brzegowego co INTERVAL sekund.
 # Uruchom na HOSCIE rownolegle z przebiegiem urzadzenia:
 #   ./scripts/collect_stats.sh iot-edge 0.5 ./data/edge_stats.csv
+# UWAGA: edge_node.py i central.py używają psutil wewnętrznie, co jest precyzyjniejsze.
+# Ten skrypt pozostaje jako backup (np. dla monitorowania brokera).
 CONTAINER="${1:-iot-edge}"
 INTERVAL="${2:-0.5}"
 OUT="${3:-./data/edge_stats.csv}"

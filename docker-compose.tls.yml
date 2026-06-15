@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# docker-compose.tls.yml — override do scenariusza S5 (TLS + ACL)
+# docker-compose.tls.yml — override do scenariusza S6 (TLS + ACL)
 # ---------------------------------------------------------------------------
 # Użycie:
 #   1. Wygeneruj certyfikaty: ./scripts/gen_certs.sh

@@ -18,10 +18,12 @@ import json
 import os
 import sys
 from collections import defaultdict
-
 import numpy as np
 import pandas as pd
 
+# Wymuś UTF-8 dla print() w konsoli Windows
+if sys.stdout.encoding.lower() != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 def load_runs(data_root, location, scenario):
     """Wczytuje results.json ze wszystkich runów dla danego location×scenario."""

@@ -54,10 +54,10 @@ for SCENARIO in "${SCENARIOS[@]}"; do
   done
 done
 
-# S6: Skalowalnośc — dodatkowe runy z większą liczbą urządzeń
+# PB5: Skalowalność — dodatkowe runy z większą liczbą urządzeń
 echo ""
 echo "################################################################"
-echo "  BONUS: SKALOWALNOŚC (S6) — $DEVICE_COUNT_SCALE urządzeń"
+echo "  BONUS: SKALOWALNOŚC (PB5) — $DEVICE_COUNT_SCALE urządzeń"
 echo "################################################################"
 echo ""
 

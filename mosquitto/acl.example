@@ -1,4 +1,4 @@
-# Przyklad listy ACL (zasada najmniejszych uprawnien) - do scenariusza S5.
+# Przyklad listy ACL (zasada najmniejszych uprawnien) - do scenariusza S6.
 # Urzadzenie moze tylko publikowac na swoj temat telemetrii:
 #   user dev-01
 #   topic write iot/dev-01/telemetry

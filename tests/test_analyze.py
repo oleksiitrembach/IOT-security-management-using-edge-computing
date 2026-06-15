@@ -51,10 +51,14 @@ def _compute_metrics(gt, det):
     FN = int(((~m.detected) & (m.is_anomaly)).sum())
     TN = int(((~m.detected) & (~m.is_anomaly)).sum())
 
-    prec = TP / (TP + FP) if (TP + FP) > 0 else 0.0
-    rec = TP / (TP + FN) if (TP + FN) > 0 else 0.0
-    f1 = 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0.0
+    has_anom = (TP + FN) > 0
+    prec = TP / (TP + FP) if (TP + FP) > 0 else None
+    rec = TP / (TP + FN) if (TP + FN) > 0 else None
+    f1 = 2 * prec * rec / (prec + rec) if (has_anom and prec is not None and rec is not None and (prec + rec) > 0) else None
     fpr = FP / (FP + TN) if (FP + TN) > 0 else 0.0
+
+    if not has_anom:
+        prec = rec = f1 = None
 
     return TP, FP, FN, TN, prec, rec, f1, fpr
 
@@ -144,9 +148,8 @@ class TestEdgeCases:
                   pd.DataFrame(det_rows, columns=["event_id", "ts_alert",
                                                    "reason", "source"])
         TP, FP, FN, TN, prec, rec, f1, fpr = _compute_metrics(gt, det)
-        assert prec == 0.0
-        assert f1 == 0.0
-        assert not np.isnan(f1), "F1 nie powinno byc NaN!"
+        assert prec is None
+        assert f1 is None
 
     def test_no_anomalies_no_detections(self):
         """Tylko normalny ruch, zero wykryć → TN=100%, reszta=0."""
@@ -165,7 +168,7 @@ class TestEdgeCases:
         assert FN == 0
         assert TN == 2
         assert fpr == 0.0
-        assert f1 == 0.0
+        assert f1 is None
 
     def test_all_missed(self):
         """Wszystkie anomalie pominięte → recall=0, F1=0."""
@@ -180,7 +183,7 @@ class TestEdgeCases:
                                                    "reason", "source"])
         TP, FP, FN, TN, prec, rec, f1, fpr = _compute_metrics(gt, det)
         assert rec == 0.0
-        assert f1 == 0.0
+        assert f1 is None
 
 
 class TestDetectionTime:

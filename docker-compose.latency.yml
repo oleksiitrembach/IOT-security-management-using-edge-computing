@@ -1,0 +1,15 @@
+# Overlay: czyste, kierunkowe opoznienie lacza broker -> central (PB1).
+# Zastepuje wadliwe egress-only `netem`. Uruchom razem z bazowym compose:
+#   DETECTION_LOCATION=central docker compose -f docker-compose.yml -f docker-compose.latency.yml up -d --build
+# Potem:  ./scripts/init_toxiproxy.sh 60
+services:
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.9.0
+    container_name: iot-toxiproxy
+    ports:
+      - "8474:8474"   # API toxiproxy (host)
+    depends_on: [broker]
+  central:
+    environment:
+      BROKER_HOST: toxiproxy
+      BROKER_PORT: "1883"

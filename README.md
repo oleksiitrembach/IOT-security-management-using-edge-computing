@@ -66,8 +66,10 @@ DATA_DIR=./data VARIANT=edge python analyze/analyze.py
 | `normal`   | S1 — Normal traffic only | FPR, resource baseline |
 | `mixed`    | S2 — Increased load (5% anomalies) | Scalability, resources |
 | `flood`    | S3 — Message flooding | Detection time, recall |
-| `payload`  | S4 — Payload anomaly | Detection time, precision |
-| `value`    | — Value spike (k-sigma) | Statistical rule recall |
+| `payload`  | S4 — Payload size anomaly   | Precision of size rule    |
+| `value`    | S5 — Value spike (k-sigma) | Statistical rule recall |
+| (N/A)      | S6 — Access Control        | TLS/ACL verification      |
+| (N/A)      | S7 — Edge node failure     | System resilience         |
 
 ## Research Question Mapping
 

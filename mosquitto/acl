@@ -1,4 +1,4 @@
-# Przykladowa lista ACL (zasada najmniejszych uprawnien) - do scenariusza S5.
+# Przykladowa lista ACL (zasada najmniejszych uprawnien) - do scenariusza S6.
 # Urzadzenie moze tylko publikowac na swoj temat telemetrii.
 # Wezel brzegowy/central moze subskrybowac telemetrie i publikowac alerty.
 

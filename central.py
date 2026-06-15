@@ -204,6 +204,11 @@ client.on_message = on_message
 
 threading.Thread(target=_stats_worker, daemon=True).start()
 
+if os.getenv("MQTT_TLS"):
+    client.tls_set(ca_certs=os.getenv("MQTT_CA"))
+    if os.getenv("MQTT_USER") and os.getenv("MQTT_PASS"):
+        client.username_pw_set(os.getenv("MQTT_USER"), os.getenv("MQTT_PASS"))
+
 for _ in range(60):
     try:
         client.connect(BROKER_HOST, BROKER_PORT, keepalive=30)
