@@ -185,7 +185,7 @@ def main():
                     data_sets.append(loc_data[loc])
                     colors.append("#4C72B0" if loc == "edge" else "#DD8452")
 
-            bp = ax.boxplot(data_sets, vert=True, patch_artist=True, labels=labels)
+            bp = ax.boxplot(data_sets, patch_artist=True, tick_labels=labels)
             for patch, color in zip(bp["boxes"], colors):
                 patch.set_facecolor(color)
                 patch.set_alpha(0.7)
