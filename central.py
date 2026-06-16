@@ -3,8 +3,9 @@
 W trybie ``DETECTION_LOCATION=edge`` subskrybuje temat ``alerts`` i loguje
 wykrycia dokonane przez węzeł brzegowy. W trybie ``central`` sam wykonuje
 detekcję na danych telemetrycznych — identyczna logika jak na edge, ale
-w kontenerze obciążonym opóźnieniem sieciowym ``tc netem``
-(patrz ``scripts/apply_netem.sh``).
+w kontenerze, do którego telemetria dociera przez kierunkowy serwer proxy
+opóźnienia (``toxiproxy``, downstream broker→central; patrz ``run.py``,
+funkcja ``init_toxiproxy``).
 
 Loguje:
 - ``detections.csv`` — wykrycia (event_id, ts_alert, reason, source)

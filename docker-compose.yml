@@ -56,8 +56,6 @@ services:
       STATS_INTERVAL: ${STATS_INTERVAL:-0.5}
     volumes:
       - ${DATA_DIR:-./data}:/data
-    cap_add:
-      - NET_ADMIN          # wymagane do `tc netem` (scripts/apply_netem.sh)
     depends_on:
       broker:
         condition: service_healthy

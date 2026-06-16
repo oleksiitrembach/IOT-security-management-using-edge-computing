@@ -3,7 +3,7 @@
 Reproducible containerized environment for a master's thesis on IoT security
 management using edge computing. Compares anomaly detection at the **edge node**
 vs. the **central system** using Docker containers with cgroup resource limits
-and `tc netem` network emulation.
+and a directional latency proxy (`toxiproxy`).
 
 > **Thesis:** *Zarządzanie bezpieczeństwem sieci IoT z wykorzystaniem
 > przetwarzania brzegowego (edge computing)*
@@ -21,7 +21,7 @@ and `tc netem` network emulation.
                      ┌──────────────┐   ┌──────────────┐
                      │  Edge Node   │   │   Central    │
                      │  (1 CPU,     │   │   System     │
-                     │   512MB)     │   │  (+ netem)   │
+                     │   512MB)     │   │  (+ delay)   │
                      │  detection   │   │  detection   │
                      │  (edge mode) │   │  (central)   │
                      └──────────────┘   └──────────────┘
@@ -85,7 +85,7 @@ per-run analysis automatically.
 | PB1 | Edge vs central detection time | `ts_alert − ts_pub` per variant |
 | PB2 | Detection effectiveness | Precision, recall, F1, FPR |
 | PB3 | Edge node resource usage | CPU%, RAM via `psutil` |
-| PB4 | Access control impact (S5) | TLS/ACL overlay comparison |
+| PB4 | Access control impact (S6) | TLS/ACL overlay comparison |
 | PB5 | Scalability | `--scale device=N` |
 
 ## Running All Experiments

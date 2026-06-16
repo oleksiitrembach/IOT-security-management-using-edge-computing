@@ -1,7 +1,6 @@
 FROM python:3.12-slim
-# iproute2 dostarcza `tc` do emulacji opoznienia sieciowego (netem) w kontenerze central
-RUN apt-get update && apt-get install -y --no-install-recommends iproute2 \
-    && rm -rf /var/lib/apt/lists/*
+# Opoznienie chmury emulujemy kierunkowo przez toxiproxy (osobny kontener),
+# wiec obraz nie wymaga `tc`/iproute2 ani uprawnienia NET_ADMIN.
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
