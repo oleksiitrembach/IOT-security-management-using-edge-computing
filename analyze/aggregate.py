@@ -252,8 +252,10 @@ def main():
                     and central_key in all_results
                     and all_results[central_key].get("cpu_mean_central")):
                 labels_cpu.append(s)
-                cpu_edge.append(all_results[edge_key]["cpu_mean_edge"]["mean"])
-                cpu_central.append(all_results[central_key]["cpu_mean_central"]["mean"])
+                # Mediana, nie srednia: pojedyncze startowe probki psutil zawyzaja
+                # srednia (np. payload-edge ~3,4%) i przecza tabeli zasobow (~0,2%).
+                cpu_edge.append(all_results[edge_key]["cpu_mean_edge"]["median"])
+                cpu_central.append(all_results[central_key]["cpu_mean_central"]["median"])
 
         if labels_cpu:
             fig, ax = plt.subplots(figsize=(10, 5))
@@ -264,8 +266,8 @@ def main():
             ax.bar(x + width / 2, cpu_central, width, label="Scentralizowany",
                    color="#DD8452", alpha=0.8)
             ax.set_xlabel("Scenariusz")
-            ax.set_ylabel("Średnie CPU [%]")
-            ax.set_title("Porównanie obciążenia CPU — Tabela 6")
+            ax.set_ylabel("Mediana CPU [%]")
+            ax.set_title("Porównanie obciążenia CPU (mediana) — wariant brzegowy vs scentralizowany")
             ax.set_xticks(x)
             ax.set_xticklabels(labels_cpu)
             ax.legend()
